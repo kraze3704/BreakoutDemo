@@ -67,14 +67,30 @@ function drawPaddle() {
 }
 
 function collisionCheck() {
-    // check for top & bottom collision
-    if (ball.y + dy < RADIUS || ball.y + dy > CANVAS_HEIGHT - RADIUS) {
+    // check for top & bottom wall collision
+    if (ball.y + dy < RADIUS) {
         dy = -dy;
+    } else if (ball.y + dy > CANVAS_HEIGHT - RADIUS) {
+        // game over statement
+        alert("GAME OVER");
+        document.location.reload();
     }
-    // check for left & right collision
+    // check for left & right wall collision
     if (ball.x + dx < RADIUS || ball.x + dx > CANVAS_WIDTH - RADIUS) {
         dx = -dx;
     }
+
+    // check for paddle collision
+    /*
+      paddle attributes: paddleX, paddleHeight, paddleWidth
+      ball attributes: ball.x, ball.y, RADIUS
+
+      1. check if center of the ball is between the paddle => x value of the ball BETWEEN paddleX to paddleX + paddleWidth
+         AND
+      2. check if the ball is touching the paddle => y value of the ball + RADIUS > CANVAS WIDTH - paddleHeight
+      3. invert dy
+      4. success?
+    */
 }
 
 function drawBall() {
