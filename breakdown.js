@@ -3,24 +3,32 @@
 const canvas = document.querySelector("#myCanvas");
 const ctx = canvas.getContext("2d");
 
-// attributes between beginPath() and closePath()
-ctx.beginPath();
-// paint a red square starting from (20, 40) of the canvas with 50px height & width
-ctx.rect(20, 40, 50, 50);
-ctx.fillStyle = "#FF0000";
-ctx.fill();
-ctx.closePath();
+const ball = {
+    x: canvas.width/2,
+    y: canvas.height-30,
+};
 
-ctx.beginPath();
-// center at (240, 160), radius of 20, start&end angle, direction(clockwise): optional
-ctx.arc(240,160, 20, 0, Math.PI*2, false);
-ctx.fillStyle = "green";
-ctx.fill();
-ctx.closePath();
+// speed of the ball
+const dx = 2;
+const dy = -2;
 
-ctx.beginPath();
-ctx.rect(160, 10, 100, 40);
-// only colors the outer stroke to semi-transparent blue with alpha channel in rgba function
-ctx.strokeStyle = "rgba(0, 0, 255, 0.5)";
-ctx.stroke();
-ctx.closePath();
+
+
+function drawBall() {
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, 10, 0, Math.PI*2);
+    ctx.fillStyle = "#0095DD";
+    ctx.fill();
+    ctx.closePath();
+}
+
+function draw() {
+    window.requestAnimationFrame(draw);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawBall();
+    ball.x += dx;
+    ball.y += dy;
+}
+
+window.requestAnimationFrame(draw);
