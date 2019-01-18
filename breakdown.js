@@ -67,14 +67,21 @@ function drawPaddle() {
 }
 
 function collisionCheck() {
-    // check for top & bottom wall collision
+    // check for top wall collision & paddle collision
     if (ball.y + dy < RADIUS) {
         dy = -dy;
-    } else if (ball.y + dy > CANVAS_HEIGHT - RADIUS) {
-        // game over statement
+    } else if (ball.y > CANVAS_HEIGHT - paddleHeight - RADIUS) {
+        // when the ball reaches the paddles height check for collision
+        if(ball.x > paddleX && ball.x < paddleX + paddleWidth){
+            dy = -dy;
+        }
+    }
+    // game-over condition: passing through the bottom floor
+    if (ball.y + dy > CANVAS_HEIGHT) {
         alert("GAME OVER");
         document.location.reload();
     }
+
     // check for left & right wall collision
     if (ball.x + dx < RADIUS || ball.x + dx > CANVAS_WIDTH - RADIUS) {
         dx = -dx;
@@ -85,9 +92,9 @@ function collisionCheck() {
       paddle attributes: paddleX, paddleHeight, paddleWidth
       ball attributes: ball.x, ball.y, RADIUS
 
-      1. check if center of the ball is between the paddle => x value of the ball BETWEEN paddleX to paddleX + paddleWidth
+      1. check if the ball is touching the paddle => y value of the ball + RADIUS > CANVAS WIDTH - paddleHeight
          AND
-      2. check if the ball is touching the paddle => y value of the ball + RADIUS > CANVAS WIDTH - paddleHeight
+      2. check if center of the ball is between the paddle => x value of the ball BETWEEN paddleX to paddleX + paddleWidth
       3. invert dy
       4. success?
     */
