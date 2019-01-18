@@ -9,3 +9,16 @@ canvas {
     display: block;
     margin: 0 auto;
 }
+
+._Description {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+    text-align: center;
+}
+
+#gameStatus {
+    display: flex;
+    justify-content: center;
+}

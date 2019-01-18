@@ -1,4 +1,6 @@
 
+const STATUS = document.querySelector("#gameStatus");
+
 // fetch the canvas by the id "myCanvas"
 const canvas = document.querySelector("#myCanvas");
 const ctx = canvas.getContext("2d");
@@ -31,7 +33,6 @@ let leftPressed = false;
 
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
-
 
 function movePaddle() {
     // check for inputs as well as collision with the wall
@@ -66,6 +67,11 @@ function drawPaddle() {
     ctx.closePath();
 }
 
+refreshGame = (e) => {
+    e.preventDefault();
+    document.location.reload();
+}
+
 function collisionCheck() {
     // check for top wall collision & paddle collision
     if (ball.y + dy < RADIUS) {
@@ -78,8 +84,24 @@ function collisionCheck() {
     }
     // game-over condition: passing through the bottom floor
     if (ball.y + dy > CANVAS_HEIGHT) {
-        alert("GAME OVER");
-        document.location.reload();
+    //    alert("GAME OVER");
+    //    document.location.reload();
+
+        // stop the ball movement
+        dx = 0;
+        dy = 0;
+        // create a gameover text and append
+        const gameoverText = document.createElement("h1");
+        gameoverText.className = "gameover_Text";
+        gameoverText.innerHTML = "GAME OVER";
+        STATUS.appendChild(gameoverText);
+
+        // create a start new game button and append
+        const newGame = document.createElement("button");
+        newGame.type = "button";
+        newGame.innerHTML = "NewGame";
+        newGame.addEventListener("click", refreshGame);
+        STATUS.appendChild(newGame);
     }
 
     // check for left & right wall collision
