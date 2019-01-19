@@ -34,6 +34,44 @@ let leftPressed = false;
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 
+// brick definition
+const brickRowCount = 3;
+const brickColumnCount = 5;
+const brickWidth = 75;
+const brickHeight = 20;
+const brickPadding = 10;
+const brickOffsetTop = 30;
+const brickOffsetLeft = 30;
+
+const bricks = [];
+
+for( let i=0; i<brickColumnCount; i++) {
+    bricks[i] = [];
+    for(let j=0; j<brickRowCount; j++) {
+        bricks[i][j] = { x: 0, y: 0 };
+    }
+};
+
+
+function drawBricks() {
+    for( let i=0; i<brickColumnCount; i++) {
+        let brickX = (i*(brickWidth + brickPadding)) + brickOffsetLeft;
+
+        for(let j=0; j<brickRowCount; j++) {
+            let brickY = (j*(brickHeight + brickPadding)) + brickOffsetTop;
+
+            bricks[i][j].x = brickX;
+            bricks[i][j].y = brickY;
+
+            ctx.beginPath();
+            ctx.rect(brickX, brickY, brickWidth, brickHeight);
+            ctx.fillSAAtyle = "#0095DD";
+            ctx.fill();
+            ctx.closePath();
+        }
+    }
+};
+
 function movePaddle() {
     // check for inputs as well as collision with the wall
     if(rightPressed && paddleX + paddleWidth < CANVAS_WIDTH) {
@@ -134,12 +172,15 @@ function draw() {
     window.requestAnimationFrame(draw);
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
+    drawBricks();
+
     movePaddle();
     drawPaddle();
     drawBall();
     collisionCheck();
     ball.x += dx;
     ball.y += dy;
+
 }
 
 window.requestAnimationFrame(draw);
