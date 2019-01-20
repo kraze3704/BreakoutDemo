@@ -8,7 +8,6 @@ const ctx = canvas.getContext("2d");
 const CANVAS_HEIGHT = canvas.height;
 const CANVAS_WIDTH = canvas.width;
 
-
 // ball definition
 const ball = {
     x: canvas.width/2,
@@ -19,7 +18,6 @@ const RADIUS = 10;
 // speed of the ball
 let dx = 2;
 let dy = -2;
-
 
 // paddle definition
 const paddleHeight = 10;
@@ -43,31 +41,63 @@ const brickPadding = 10;
 const brickOffsetTop = 30;
 const brickOffsetLeft = 30;
 
+// brick array
 const bricks = [];
-
 for( let i=0; i<brickColumnCount; i++) {
     bricks[i] = [];
     for(let j=0; j<brickRowCount; j++) {
-        bricks[i][j] = { x: 0, y: 0 };
+        bricks[i][j] = {
+            x: 0,
+            y: 0,
+            status: 1,
+            // flag to show the brick is active or not
+        };
     }
 };
 
+/*
+    brick collision detection
+    1. loop through the array of bricks every frame
+    > check for ball status with bricks.status first, then
+    2. compare the ball coordinate to see if the ball is hitting the brick
+        2.1. y coordinate of the ball BETWEEN brickY ~ brickY + brickHeight?
+        AND
+        2.2. x coordinate of the ball BETWEEN brickX ~ brickX + brickWidth?
+    4. reverse dy, change bricks.status to 0;
+*/
+function brickCollision() {
+    for ( let i=0; i<brickColumnCount; i++) {
+        for(let j=0; j<brickRowCount; j++) {
+            let CURRENT_BRICK = bricks[i][j];
+            // check ball status
+            if(CURRENT_BRICK.status == 1) {
+                // compare coordinate values
+                if(ball.y > CURRENT_BRICK.y && ball.y - RADIUS < CURRENT_BRICK.y + brickHeight && ball.x > CURRENT_BRICK.x && ball.x < CURRENT_BRICK.x + brickWidth) {
+                    dy = -dy;
+                    CURRENT_BRICK.status = 0;
+                }
+            }
+        }
+    }
+}
 
 function drawBricks() {
     for( let i=0; i<brickColumnCount; i++) {
         let brickX = (i*(brickWidth + brickPadding)) + brickOffsetLeft;
 
         for(let j=0; j<brickRowCount; j++) {
-            let brickY = (j*(brickHeight + brickPadding)) + brickOffsetTop;
+            if(bricks[i][j].status == 1) {
+                let brickY = (j*(brickHeight + brickPadding)) + brickOffsetTop;
 
-            bricks[i][j].x = brickX;
-            bricks[i][j].y = brickY;
+                bricks[i][j].x = brickX;
+                bricks[i][j].y = brickY;
 
-            ctx.beginPath();
-            ctx.rect(brickX, brickY, brickWidth, brickHeight);
-            ctx.fillSAAtyle = "#0095DD";
-            ctx.fill();
-            ctx.closePath();
+                ctx.beginPath();
+                ctx.rect(brickX, brickY, brickWidth, brickHeight);
+                ctx.fillSAAtyle = "#0095DD";
+                ctx.fill();
+                ctx.closePath();
+            }
         }
     }
 };
@@ -173,6 +203,7 @@ function draw() {
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
     drawBricks();
+    brickCollision();
 
     movePaddle();
     drawPaddle();
