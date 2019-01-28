@@ -55,6 +55,16 @@ for( let i=0; i<brickColumnCount; i++) {
     }
 };
 
+// variable to save score
+let SCORE = 0;
+
+drawScore = () => {
+    ctx.font = "16px Arial";
+    ctx.fillStyle = "#0095DD";
+    ctx.fillText("Score: " + SCORE, 8, 20);
+    // 1st param: text ("Score: " + score) / 2,3rd: coordinates where the text will be printed
+}
+
 /*
     brick collision detection
     1. loop through the array of bricks every frame
@@ -75,6 +85,7 @@ function brickCollision() {
                 if(ball.y > CURRENT_BRICK.y && ball.y - RADIUS < CURRENT_BRICK.y + brickHeight && ball.x > CURRENT_BRICK.x && ball.x < CURRENT_BRICK.x + brickWidth) {
                     dy = -dy;
                     CURRENT_BRICK.status = 0;
+                    SCORE++;
                 }
             }
         }
@@ -104,9 +115,10 @@ function drawBricks() {
 
 function movePaddle() {
     // check for inputs as well as collision with the wall
-    if(rightPressed && paddleX + paddleWidth < CANVAS_WIDTH) {
+    if(rightPressed && paddleX + (paddleWidth/2) < CANVAS_WIDTH) {
         paddleX += PADDLE_SPEED;
-    } else if(leftPressed && paddleX > 0) {
+    } else if(leftPressed && paddleX + (paddleWidth/2) > 0) {
+        // modified so paddle can move more than the left&right border
         paddleX -= PADDLE_SPEED;
     }
 }
@@ -145,10 +157,25 @@ function collisionCheck() {
     if (ball.y + dy < RADIUS) {
         dy = -dy;
     } else if (ball.y > CANVAS_HEIGHT - paddleHeight - RADIUS) {
+        /*
         // when the ball reaches the paddles height check for collision
         if(ball.x > paddleX && ball.x < paddleX + paddleWidth){
             dy = -dy;
         }
+        */
+        // if the ball hits left 1/3 part of the paddle dy = -dy AND dx--
+        // if ball hits middle 1/3 part dy = -dy
+        // if ball hits right 1/3 part dy = -dy AND dx++
+        if(ball.x > paddleX && ball.x < paddleX + (paddleWidth/3)) {
+            dx--;
+            dy = -dy;
+        }else if(ball.x < paddleX + (paddleWidth*2/3)) {
+            dy = -dy;
+        }else if(ball.x < paddleX + paddleWidth) {
+            dx++;
+            dy = -dy;
+        }
+        console.log(dx)
     }
     // game-over condition: passing through the bottom floor
     if (ball.y + dy > CANVAS_HEIGHT) {
@@ -204,6 +231,7 @@ function draw() {
 
     drawBricks();
     brickCollision();
+    drawScore();
 
     movePaddle();
     drawPaddle();
