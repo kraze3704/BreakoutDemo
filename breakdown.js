@@ -58,6 +58,21 @@ for( let i=0; i<brickColumnCount; i++) {
 // variable to save score
 let SCORE = 0;
 
+// variable to save player lives
+let LIVES = 3;
+
+drawCleared = () => {
+    ctx.font = "36px Arial";
+    ctx.fillStyle = "#0095DD";
+    ctx.fillText("CONGRATULATIONS!", CANVAS_WIDTH/2, CANVAS_HEIGHT - 30);
+}
+
+drawLives = () => {
+    ctx.font ="16px Arial";
+    ctx.fillStyle = "#0095DD";
+    ctx.fillText("Lives: " + LIVES, CANVAS_WIDTH - 65, 20);
+}
+
 drawScore = () => {
     ctx.font = "16px Arial";
     ctx.fillStyle = "#0095DD";
@@ -86,6 +101,27 @@ function brickCollision() {
                     dy = -dy;
                     CURRENT_BRICK.status = 0;
                     SCORE++;
+
+                    // win condition check: all bricks destroyed
+                    if(SCORE == brickRowCount*brickColumnCount) {
+                        // stop ball movement
+                        dx = 0;
+                        dy = 0;
+
+                        // create game completed text and append to html
+                        const gameCleared = document.createElement("h1");
+                        gameCleared.className = "game_cleared_text";
+                        gameCleared.innerHTML = "GAME CLEARED! CONGRATULATIONS";
+                        STATUS.appendChild(gameCleared);
+
+                        // create 'new game' button
+                        const newGame = document.createElement("button");
+                        newGame.type = "button";
+                        newGame.innerHTML = "NewGame";
+                        newGame.addEventListener("click", refreshGame);
+                        STATUS.appendChild(newGame);
+                        // display clear time?
+                    }
                 }
             }
         }
@@ -141,7 +177,19 @@ function keyUpHandler(e) {
 
 function drawPaddle() {
     ctx.beginPath();
-    ctx.rect(paddleX, CANVAS_HEIGHT - paddleHeight, paddleWidth, paddleHeight);
+    ctx.rect(paddleX, CANVAS_HEIGHT - paddleHeight, paddleWidth/3, paddleHeight);
+    ctx.fillStyle = "#0095DD";
+    ctx.fill();
+    ctx.closePath();
+
+    ctx.beginPath();
+    ctx.rect(paddleX + paddleWidth/3, CANVAS_HEIGHT - paddleHeight, paddleWidth/3, paddleHeight);
+    ctx.fillStyle = "#00CCDD";
+    ctx.fill();
+    ctx.closePath();
+
+    ctx.beginPath();
+    ctx.rect(paddleX + paddleWidth*2/3, CANVAS_HEIGHT - paddleHeight, paddleWidth/3, paddleHeight);
     ctx.fillStyle = "#0095DD";
     ctx.fill();
     ctx.closePath();
@@ -169,34 +217,47 @@ function collisionCheck() {
         if(ball.x > paddleX && ball.x < paddleX + (paddleWidth/3)) {
             dx--;
             dy = -dy;
-        }else if(ball.x < paddleX + (paddleWidth*2/3)) {
+        }else if(ball.x > paddleX + (paddleWidth/3) && ball.x < paddleX + (paddleWidth*2/3)) {
             dy = -dy;
-        }else if(ball.x < paddleX + paddleWidth) {
+        }else if(ball.x > paddleX + (paddleWidth*2/3) && ball.x < paddleX + paddleWidth) {
             dx++;
             dy = -dy;
         }
-        console.log(dx)
+        // check dx value to verify
+//      console.log(dx)
     }
     // game-over condition: passing through the bottom floor
     if (ball.y + dy > CANVAS_HEIGHT) {
-    //    alert("GAME OVER");
-    //    document.location.reload();
+        LIVES--;
+        // check for player lives to decide next frame
+        if(!LIVES) {
+            // stop the ball movement
+            // move ball out of canvas
+            dx = 0;
+            dy = 0;
+            ball.x = -20;
+            ball.y = -20;
 
-        // stop the ball movement
-        dx = 0;
-        dy = 0;
-        // create a gameover text and append
-        const gameoverText = document.createElement("h1");
-        gameoverText.className = "gameover_Text";
-        gameoverText.innerHTML = "GAME OVER";
-        STATUS.appendChild(gameoverText);
+            // create a gameover text and append
+            const gameoverText = document.createElement("h1");
+            gameoverText.className = "gameover_Text";
+            gameoverText.innerHTML = "GAME OVER";
+            STATUS.appendChild(gameoverText);
 
-        // create a start new game button and append
-        const newGame = document.createElement("button");
-        newGame.type = "button";
-        newGame.innerHTML = "NewGame";
-        newGame.addEventListener("click", refreshGame);
-        STATUS.appendChild(newGame);
+            // create a start new game button and append
+            const newGame = document.createElement("button");
+            newGame.type = "button";
+            newGame.innerHTML = "NewGame";
+            newGame.addEventListener("click", refreshGame);
+            STATUS.appendChild(newGame);
+        } else {
+            // reset game to initial state
+            ball.x = CANVAS_WIDTH /2;
+            ball.y = CANVAS_HEIGHT - 30;
+            dx = 2;
+            dy = -2;
+            paddleX = (CANVAS_WIDTH - paddleWidth)/2;
+        }
     }
 
     // check for left & right wall collision
@@ -232,6 +293,7 @@ function draw() {
     drawBricks();
     brickCollision();
     drawScore();
+    drawLives();
 
     movePaddle();
     drawPaddle();
@@ -241,5 +303,20 @@ function draw() {
     ball.y += dy;
 
 }
+
+/*
+MAYBE...
+
+> add flag to determine when to change main function? => print `congratulations` or `game over` instead of appending html & stop paddle and ball
+> js moduling
+> different colors for the paddle parts
+> different scores for certain bricks (need to modify game clear condition as well)
+> background image?
+> improve collision detection with paddle and bricks
+> clean this messy code
+> clean variables?
+> define functions for repetetive operations
+> start the game with ball falling on paddle instead of flying up
+*/
 
 window.requestAnimationFrame(draw);
